@@ -26,6 +26,18 @@ public class Graph {
 
 	}
 
+	public void deleteEdge(int src, int dest) {
+		// should update these index
+		vertices.get(src).deleteNeighbour(dest);
+
+		for (Vertex v : vertices) {
+			if (v.containsEdge(src, dest)) {
+				runBFS(src);
+			}
+		}
+
+	}
+
 	public void addEdge(int sourceId, int destId) {
 
 		if (!idToIndex.containsKey(sourceId)) {

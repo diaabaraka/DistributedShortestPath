@@ -96,5 +96,17 @@ public class Vertex {
 		}
 		
 	}
+	public boolean containsEdge(int src, int dest) {
+		String edge = src + " " + dest;
+		Iterator it = shortestPaths.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        Path path = ((Path)pair.getValue());
+	        if (path.getEdges().contains(edge)) {
+				return true;
+			}
+	    }
+	    return false;
+	}
 
 }
