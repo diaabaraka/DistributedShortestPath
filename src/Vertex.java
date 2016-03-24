@@ -90,7 +90,7 @@ public class Vertex {
 		shortestPaths.clear();
 		
 		for(int id : neighbours){
-			Path edge = new Path(1);
+			Path edge = new Path(1);	
 			edge.AddEdge(this.id + " " + id);
 			shortestPaths.put(id, edge);
 		}
