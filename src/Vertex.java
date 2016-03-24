@@ -1,3 +1,4 @@
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -6,7 +7,7 @@ import java.util.Map;
 public class Vertex {
 	private int id;
 	private HashSet<Integer> neighbours;
-	private HashMap<Integer, Integer> shortestPaths;
+	private HashMap<Integer, Path> shortestPaths;
 
 	public Vertex(int id) {
 		this.id = id;
@@ -26,8 +27,10 @@ public class Vertex {
 		
 	}
 	public void addNeighbour(int id) {
+		Path edge = new Path(1);
+		edge.AddEdge(this.id + " " + id);
 		neighbours.add(id);
-		shortestPaths.put(id, 1);
+		shortestPaths.put(id, edge);
 
 	}
 
@@ -40,20 +43,23 @@ public class Vertex {
 		return neighbours.contains(id);
 	}
 
-	public void addShortestPath(int dest, int cost) {
-		shortestPaths.put(dest, cost);
+	public void addShortestPath(int dest, Path path) {
+		shortestPaths.put(dest, path);
 	}
 
-	public int getShortestPath(int dest) {
-		return shortestPaths.get(dest);
+	public int getShortestPathCost(int dest) {
+		return shortestPaths.get(dest).getCost();
+	}
+	public HashSet<String> getShortestPath(int dest) {
+		return shortestPaths.get(dest).getEdges();
 	}
 
 	public boolean isReachable(int dest) {
 		return shortestPaths.containsKey(dest);
 	}
 
-	public void updateShortestPath(int dest, int cost) {
-		shortestPaths.put(dest, cost);
+	public void updateShortestPath(int dest, Path path) {
+		shortestPaths.put(dest, path);
 	}
 
 	public int getId() {
@@ -72,11 +78,11 @@ public class Vertex {
 		this.neighbours = neighbours;
 	}
 
-	public HashMap<Integer, Integer> getShortestPaths() {
+	public HashMap<Integer, Path> getShortestPaths() {
 		return shortestPaths;
 	}
 
-	public void setShortestPaths(HashMap<Integer, Integer> shortestPaths) {
+	public void setShortestPaths(HashMap<Integer, Path> shortestPaths) {
 		this.shortestPaths = shortestPaths;
 	}
 
@@ -84,7 +90,9 @@ public class Vertex {
 		shortestPaths.clear();
 		
 		for(int id : neighbours){
-			shortestPaths.put(id, 1);
+			Path edge = new Path(1);
+			edge.AddEdge(this.id + " " + id);
+			shortestPaths.put(id, edge);
 		}
 		
 	}
