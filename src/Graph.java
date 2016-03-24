@@ -121,8 +121,13 @@ public class Graph {
 					queue.add(vertices.get(id));
 				} else if (!startingNode.isReachable(id)) {
 
-					int cost = startingNode.getShortestPath(curNode.getId()) + 1;
-					startingNode.addShortestPath(id, cost);
+					int cost = startingNode.getShortestPathCost(curNode.getId()) + 1;
+					Path path = new Path(cost);
+
+					path.setEdges(startingNode.getShortestPath(curNode.getId()));
+					path.AddEdge(curNode.getId() + " " + id);
+
+					startingNode.addShortestPath(id, path);
 					// get the correct id
 					queue.add(vertices.get(id));
 
