@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 public class Graph {
@@ -20,7 +22,7 @@ public class Graph {
 	public void addVertex(int id) {
 
 		// map id to array index
-		Vertex newVertex = new Vertex(id);
+		Vertex newVertex = new Vertex(nodeCount);
 		vertices.add(newVertex);
 		idToIndex.put(id, nodeCount++);
 
@@ -28,24 +30,35 @@ public class Graph {
 
 	public void deleteEdge(int src, int dest) {
 		// should update these index
+		// check if it's neigbour
 		vertices.get(src).deleteNeighbour(dest);
 
 		for (Vertex v : vertices) {
 			if (v.containsEdge(src, dest)) {
-				runBFS(src);
+				runBFS(v.getId());
 			}
 		}
 
 	}
 
 	public void addEdge(int sourceId, int destId) {
-
+		boolean newSrc = false;
 		if (!idToIndex.containsKey(sourceId)) {
 			addVertex(sourceId);
+			newSrc = true;
 		}
 		if (!idToIndex.containsKey(destId)) {
 			addVertex(destId);
+			// loop over all the vertices and add this new node
+			
+			addNewDest(idToIndex.get(sourceId) , idToIndex.get(destId));
+						
 		}
+		
+		if(newSrc){
+			addNewSrc(idToIndex.get(sourceId) , idToIndex.get(destId));
+		}
+		
 		int source = idToIndex.get(sourceId);
 		int dest = idToIndex.get(destId);
 
@@ -54,6 +67,61 @@ public class Graph {
 
 	}
 
+	private void addNewDest(int src , int dest) {
+		// TODO Auto-generated method stub
+		for(Vertex v : vertices){
+			
+			if(v.isReachable(src)){
+				HashSet<String> edges = v.getShortestPath(src);
+				edges.add(src+" "+dest);
+				int cost = v.getShortestPathCost(src)+1;
+				Path path = new Path(cost);
+				path.setEdges(edges);
+				v.addShortestPath(dest, path);
+				
+				
+			}
+			
+		}
+		
+		
+		
+		
+	}
+
+	private void addNewSrc(int src , int dest) {
+		// TODO Auto-generated method stub
+		Vertex newSrc = vertices.get(src);
+		
+		Vertex destVertex = vertices.get(dest);
+		
+		 HashMap<Integer, Path> shortestPaths = destVertex.getShortestPaths();
+		 
+		 Iterator it = shortestPaths.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+		        Path path = (Path)pair.getValue();
+//		        System.out.println(pair.getKey() + " = " + ((Path)pair.getValue()).getCost());
+		        Path newPath = new Path(path.getCost()+1);
+		        newPath.setEdges(path.getEdges());
+		        newPath.AddEdge(src+" "+dest);
+		        newSrc.addShortestPath((int)pair.getKey(), newPath);
+		        
+		        
+		               
+		        
+		    }
+		 
+		 
+		
+		
+		
+		
+		
+		
+	}
+	
+	
 	public void relaxPaths(int src, int dest) {
 		for (int i = 0; i < vertices.size(); i++) {
 			for (int j = i + 1; j < vertices.size(); j++) {
