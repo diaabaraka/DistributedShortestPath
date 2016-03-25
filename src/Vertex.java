@@ -15,13 +15,14 @@ public class Vertex {
 		shortestPaths = new HashMap<>();
 	}
 
-	public void printShortestPaths(){
+	public  void printShortestPaths(){
+			Iterator it = shortestPaths.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+		        System.out.println(pair.getKey() + " = " + ((Path)pair.getValue()).getCost());
+		    }
 		
-		Iterator it = shortestPaths.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry pair = (Map.Entry)it.next();
-	        System.out.println(pair.getKey() + " = " + ((Path)pair.getValue()).getCost());
-	    }
+		
 		
 		
 		
@@ -55,7 +56,7 @@ public class Vertex {
 	}
 
 	public boolean isReachable(int dest) {
-		return shortestPaths.containsKey(dest);
+		return shortestPaths.containsKey(dest) || this.id == dest;
 	}
 
 	public void updateShortestPath(int dest, Path path) {
