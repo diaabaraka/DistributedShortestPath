@@ -33,38 +33,41 @@ public class Graph {
 	}
 
 	public void deleteEdge(int src, int dest) {
+		
 		// should update these index
 		// check if it's neigbour
+		if (!idToIndex.containsKey(src) || !idToIndex.containsKey(dest))
+			return ;
+		 src = idToIndex.get(src);
+		 dest = idToIndex.get(dest);
+		if (!vertices.get(src).isNeighbour(dest))
+			return ;
 		
-		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime()
-				.availableProcessors());
+		
 
-		
-		
+		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
 		vertices.get(src).deleteNeighbour(dest);
 
 		for (Vertex v : vertices) {
 			if (v.containsEdge(src, dest)) {
-				
+
 				final int nodeIndex = v.getId();
-				 es.execute(new Runnable() {
-				 public void run() {
+				es.execute(new Runnable() {
+					public void run() {
 						runBFS(nodeIndex);
-				 }
-				 });
-				
-				
+					}
+				});
+
 			}
 		}
-		
-		 es.shutdown();
-		 try {
-		 es.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-		 } catch (InterruptedException e) {
-		
-		 }
-		
-		
+
+		es.shutdown();
+		try {
+			es.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+
+		}
 
 	}
 
@@ -113,7 +116,7 @@ public class Graph {
 		// TODO Auto-generated method stub
 		for (Vertex v : vertices) {
 
-			if (v.isReachable(src)) {
+			if (v.isReachable(src) && v.getId() != src) {
 				HashSet<String> edges = v.getShortestPath(src);
 				edges.add(src + " " + dest);
 				int cost = v.getShortestPathCost(src) + 1;
@@ -151,20 +154,18 @@ public class Graph {
 	}
 
 	public void relaxPaths(int src, int dest) {
-		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime()
-				.availableProcessors());
+		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 		for (int i = 0; i < vertices.size(); i++) {
 
-//			 relaxSpecificPath(i, src, dest);
+			// relaxSpecificPath(i, src, dest);
 
-
-			 final int nodeIndex = i;
-			 es.execute(new Runnable() {
-			 public void run() {
-			 relaxSpecificPath(nodeIndex, src, dest);
-			 }
-			 });
+			final int nodeIndex = i;
+			es.execute(new Runnable() {
+				public void run() {
+					relaxSpecificPath(nodeIndex, src, dest);
+				}
+			});
 
 		}
 
@@ -180,20 +181,16 @@ public class Graph {
 	public void relaxSpecificPath(int i, int src, int dest) {
 		for (int j = 0; j < vertices.size(); j++) {
 
-			if (vertices.get(i).isReachable(src)
-					&& vertices.get(dest).isReachable(j) && i != j) {
+			if (vertices.get(i).isReachable(src) && vertices.get(dest).isReachable(j) && i != j) {
 				int costViaEdge = 1;
 				if (i != src) {
 					costViaEdge += vertices.get(i).getShortestPathCost(src);
 				}
 				if (dest != j) {
-					costViaEdge += vertices.get(dest)
-							.getShortestPathCost(j);
+					costViaEdge += vertices.get(dest).getShortestPathCost(j);
 				}
 
-				if (!vertices.get(i).isReachable(j)
-						|| costViaEdge < vertices.get(i)
-								.getShortestPathCost(j)) {
+				if (!vertices.get(i).isReachable(j) || costViaEdge < vertices.get(i).getShortestPathCost(j)) {
 					Path path = new Path(costViaEdge);
 					HashSet<String> edges = new HashSet<>();
 					if (i != src) {
@@ -216,29 +213,28 @@ public class Graph {
 
 		// loop over all the vertices and calculate the shortest paths
 
-		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime()
-				.availableProcessors());
+		ExecutorService es = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 		for (int i = 0; i < vertices.size(); i++) {
 			// get the correct id?
-//			runBFS(i);
+			// runBFS(i);
 			//
-			 final int nodeIndex = i;
-			 es.execute(new Runnable() {
-			 public void run() {
-			 runBFS(nodeIndex);
-			 }
-			 });
+			final int nodeIndex = i;
+			es.execute(new Runnable() {
+				public void run() {
+					runBFS(nodeIndex);
+				}
+			});
 			//
 			//
 
 		}
-		 es.shutdown();
-		 try {
-		 es.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
-		 } catch (InterruptedException e) {
-		
-		 }
+		es.shutdown();
+		try {
+			es.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+
+		}
 
 		// while(!es.isTerminated()){
 		//
@@ -282,8 +278,7 @@ public class Graph {
 					queue.add(vertices.get(id));
 				} else if (!startingNode.isReachable(id)) {
 
-					int cost = startingNode
-							.getShortestPathCost(curNode.getId()) + 1;
+					int cost = startingNode.getShortestPathCost(curNode.getId()) + 1;
 					Path path = new Path(cost);
 					HashSet<String> edges = new HashSet<String>();
 					edges.addAll(startingNode.getShortestPath(curNode.getId()));
@@ -300,6 +295,16 @@ public class Graph {
 
 		}
 
+	}
+
+	public int getShortestPath(int src, int dest) {
+		if (!idToIndex.containsKey(src) || !idToIndex.containsKey(dest))
+			return -1;
+		 src = idToIndex.get(src);
+		 dest = idToIndex.get(dest);
+		if (!vertices.get(src).isReachable(dest))
+			return -1;
+		return vertices.get(src).getShortestPathCost(dest);
 	}
 
 }
