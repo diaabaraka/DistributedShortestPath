@@ -19,6 +19,7 @@ public class Controller {
 			dest = Integer.parseInt(st.nextToken());
 			graph.addEdge(src, dest);
 		}
+		
 		graph.allPairsShortestPath();
 		
 		System.out.println("R");
