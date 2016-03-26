@@ -265,11 +265,15 @@ public class Graph {
 		Vertex startingNode = vertices.get(source);
 		startingNode.clearAllPaths();
 		queue.add(startingNode);
-
+		HashSet<Integer>done = new HashSet<Integer>();
 		while (!queue.isEmpty()) {
 
 			Vertex curNode = queue.poll();
-
+			if (done.contains(curNode.getId())) {
+				continue;
+			}
+			done.add(curNode.getId());
+//			System.out.println(source+" "+ curNode.getId());
 			HashSet<Integer> neighbours = curNode.getNeighbours();
 
 			for (int id : neighbours) {
@@ -287,6 +291,7 @@ public class Graph {
 
 					startingNode.addShortestPath(id, path);
 					// get the correct id
+//					System.out.println("inside Loop " +source+" "+ id);
 					queue.add(vertices.get(id));
 
 				}
